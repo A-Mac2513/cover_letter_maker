@@ -29,4 +29,9 @@
             <Font name="System Bold" size="14.0" />
         </font>
     </Button>
+    <Button alignment="CENTER" onAction="#onMakeCustomCLButtonClick" prefHeight="52.0" prefWidth="150.0" style="-fx-background-color: #0079FF; -fx-border-radius: 50px;" text="Create Cover Letter" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="ALWAYS">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Button>
 </VBox>

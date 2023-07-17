@@ -10,6 +10,7 @@ Revision History:
 
 package com.andrew_macdonald.custom_cl;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javafx.stage.FileChooser;
@@ -28,15 +30,8 @@ import org.apache.poi.xwpf.usermodel.*;
 public class FileIOController {
 
     //region Variables
-    String site_name = "JobBank.ca";
-    String company_name = "";
-    String company_location = "";
-    String job_number = "";
-    String role_name = "";
-    List<String> tasks = new ArrayList<>();
-    List<String> skills = new ArrayList<>();
-    String folder_name = "";
-    String todays_date = get_date();
+    final String site_name = "JobBank.ca";
+    String folder_path = "";
     XWPFDocument job_posting = null;
     final Pattern date_pattern = Pattern.compile("<DATE>");
     final Pattern company_pattern = Pattern.compile("<COMPANY_NAME>");
@@ -62,6 +57,17 @@ public class FileIOController {
 
     //region Functional Methods
 
+    // Gets the folder path from File.getPath()
+    // return: the folder path as a string without the file name at the end
+    private void get_folder_path() {
+        StringBuilder path = new StringBuilder();
+        List<String> directories = List.of(folder_path.split("\\\\"));
+        for (int i = 0; i < directories.size() - 1; i++) {
+            path.append(directories.get(i)).append("\\");
+        }
+        folder_path = path.toString();
+    }
+
     // Gets today's date as a string
     // return: today's date as a string
     private static String get_date() {
@@ -82,6 +88,7 @@ public class FileIOController {
             job_posting = fileChooser.showOpenDialog(new Stage());
             if (job_posting != null) {
                 outputText.setText(job_posting.getName());
+                folder_path = job_posting.getPath();
             } else {
                 outputText.setText("No job posting selected");
             }
@@ -91,6 +98,7 @@ public class FileIOController {
         }
         assert job_posting != null;
         FileInputStream fis = new FileInputStream(job_posting);
+        System.out.println("File Path: " + folder_path);
         return new XWPFDocument(fis);
     }
 
@@ -140,7 +148,7 @@ public class FileIOController {
     // param body: the body of the job posting
     // param section_name: the name of the section to find
     // return: a list of the start and end indexes of the section
-    private List<Integer> find_start_end_indexes (List<IBodyElement> body, String section_name) {
+    private List<Integer> find_start_end_indexes(List<IBodyElement> body, String section_name) {
         int start_index = -1;
         int end_index = -1;
         int number = 0;
@@ -228,6 +236,102 @@ public class FileIOController {
         return job_skills;
     }
 
+    // Get the custom fields to replace and replace them with the appropriate content
+    // param paragraphs: the paragraphs of the job posting
+    // param paragraph: the paragraph to search for custom fields
+    // param index: the index of the paragraph to search for custom fields
+    private void find_replace_custom_fields(List<XWPFParagraph> paragraphs, XWPFParagraph paragraph, int index) { //, List<String> replacement_contents) {
+        String search_para = paragraph.getText();
+        for (Pattern pattern : custom_fields) {
+            Matcher matcher = pattern.matcher(search_para);
+            if (matcher.find()) {
+                System.out.println("Found " + pattern);
+                switch (matcher.group()) {
+                    case "<DATE>":
+                        XWPFParagraph date = paragraphs.get(index);
+                        date.createRun();
+                        date.getRuns().get(0).setText(get_date(), 0);
+                        XWPFParagraph found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<COMPANY_NAME>":
+                        XWPFParagraph company = paragraphs.get(index);
+                        company.createRun();
+                        company.getRuns().get(0).setText(get_company_name(), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<ROLE>":
+                        XWPFParagraph role = paragraphs.get(index);
+                        role.createRun();
+                        role.getRuns().get(0).setText(get_job_role_name(), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<LOCATION>":
+                        XWPFParagraph location = paragraphs.get(index);
+                        location.createRun();
+                        location.getRuns().get(0).setText(get_job_location(), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<JOB_NUMBER>":
+                        XWPFParagraph job_number = paragraphs.get(index);
+                        job_number.createRun();
+                        job_number.getRuns().get(0).setText(get_job_number(), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<TASKS>":
+                        StringBuilder replacement_tasks = new StringBuilder();
+                        List<String> task_strings = get_tasks();
+                        for (String task : task_strings) {
+                            replacement_tasks.append(task);
+                        }
+                        XWPFParagraph tasks = paragraphs.get(index);
+                        tasks.createRun();
+                        tasks.getRuns().get(0).setText(String.valueOf(replacement_tasks), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<SKILLS>":
+                        StringBuilder replacement_skills = new StringBuilder();
+                        List<String> skill_strings = get_skills();
+                        for (String skill : skill_strings) {
+                            replacement_skills.append(skill);
+                        }
+                        XWPFParagraph skills = paragraphs.get(index);
+                        skills.createRun();
+                        skills.getRuns().get(0).setText(String.valueOf(replacement_skills), 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                    case "<SITE_NAME>":
+                        XWPFParagraph site_name = paragraphs.get(index);
+                        site_name.createRun();
+                        site_name.getRuns().get(0).setText(this.site_name, 0);
+                        found_paragraph = paragraphs.get(index);
+                        break;
+                }
+            } else {
+                index++;
+            }
+        }
+    }
+
+    // Write the custom cover letter to a file and save it
+    // param template_cover_letter: the template cover letter
+    private void write_custom_cover_letter(XWPFDocument template_cover_letter) throws IOException {
+        String file_name = "Cover Letter.docx";
+        File file = new File(folder_path);
+        // Check if the directory exists, if not, create it
+        if (!file.exists()) {
+            System.out.println("Creating directory: " + folder_path);
+            boolean file_made = file.mkdirs();
+            System.out.println("File made: " + file_made);
+        }
+        // Create the output stream and write the file
+        FileOutputStream out_stream = new FileOutputStream(new File(folder_path + "\\" + file_name));
+        template_cover_letter.write(out_stream);
+
+        System.out.println("Written to file: " + folder_path + file_name);
+        // Close the output stream
+        out_stream.close();
+    }
+
     //endregion Functional Methods
 
     //region Event Handlers
@@ -246,6 +350,35 @@ public class FileIOController {
         }
     }
 
+    // Event handler for the "Make Custom CL" button
+    // Makes a custom cover letter for the job posting
+    // param event: the event that triggered the event handler
+    @FXML
+    public void onMakeCustomCLButtonClick(ActionEvent actionEvent) throws IOException {
+        // Get the folder path
+        get_folder_path();
+
+        // get the template for the cover letter
+        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("templates/CL_template.docx"));
+
+        // Get all paragraphs from template
+        List<XWPFParagraph> paragraphs = template_cover_letter.getParagraphs();
+
+        // Find that paragraph that contains the custom field
+        int index = 0;
+        for (XWPFParagraph paragraph : paragraphs) {
+            if (!Objects.equals(paragraph.getText(), "")) {
+                // Replace the custom field with the appropriate text
+                find_replace_custom_fields(paragraphs, paragraph, index);
+            }
+            index++;
+        }
+        // Write the cover letter to a file
+        write_custom_cover_letter(template_cover_letter);
+
+        // Close the template
+        template_cover_letter.close();
+    }
 
     //endregion Event Handlers
 }
