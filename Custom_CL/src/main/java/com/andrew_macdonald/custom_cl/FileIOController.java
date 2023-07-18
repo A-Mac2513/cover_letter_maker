@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.xwpf.usermodel.*;
+import org.apache.xmlbeans.impl.regex.RegularExpression;
 
 public class FileIOController {
 
@@ -118,10 +119,11 @@ public class FileIOController {
     // Get the job role name from the body of the job posting
     // return: the job role name as a string
     private String get_job_role_name() {
+        boolean done = false;
         List<IBodyElement> body = job_posting.getBodyElements();
         //TODO: Find a better way to get the job role without hardcoding the index
         XWPFParagraph paragraph = (XWPFParagraph) body.get(0); // The job role name is always the first paragraph when it comes from JobBank.ca.
-        return paragraph.getText().trim();
+        return paragraph.getText().replace("VERIFIED", "\s").replaceAll('\u00A0' + "", " ").trim();
     }
 
     // Get the job location from the body of the job posting
