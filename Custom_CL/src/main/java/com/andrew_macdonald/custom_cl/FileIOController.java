@@ -53,6 +53,8 @@ public class FileIOController {
     });
     @FXML
     private Label outputText;
+    private int instance_count_role_name = 2;
+    private int instance_count_company_name = 3;
     //endregion Variables
 
     //region Functional Methods
@@ -187,17 +189,20 @@ public class FileIOController {
         int end_index = find_start_end_indexes(body, "Tasks").get(1);
         XWPFParagraph body_para;
         List<String> job_tasks = new ArrayList<>();
-        for (int i = start_index; i < end_index - 1; i++) {
+        for (int i = start_index + 1; i < end_index - 1; i++) {
             if (body.get(i) instanceof XWPFParagraph) {
                 body_para = (XWPFParagraph) body.get(i);
                 if (body_para.getText().length() > 0) {
-                    job_tasks.add(body_para.getText().toLowerCase() + ", ");
+                    if (i == start_index + 1)
+                        job_tasks.add(" " + body_para.getText().toLowerCase() + ", ");
+                    else
+                        job_tasks.add(body_para.getText().toLowerCase() + ", ");
                 }
             }
         }
         if (job_tasks.size() < 1) {
             System.out.println("No tasks found, using default tasks");
-            job_tasks.add("gather client requirements, ");
+            job_tasks.add(" gather client requirements, ");
             job_tasks.add("develop and produce documentation as part of the System Development Life Cycle, ");
             job_tasks.add("prepare mock-ups and storyboards, ");
             job_tasks.add("design and develop the website/software architecture, hardware, and software requirements");
@@ -219,7 +224,10 @@ public class FileIOController {
             if (body.get(i) instanceof XWPFParagraph) {
                 body_para = (XWPFParagraph) body.get(i);
                 if (body_para.getText().length() > 0) {
-                    job_skills.add(body_para.getText().toLowerCase() + ", ");
+                    if (i == start_index)
+                        job_skills.add(" " + body_para.getText().toLowerCase() + ", ");
+                    else
+                        job_skills.add(body_para.getText().toLowerCase() + ", ");
                 }
             }
         }
@@ -231,7 +239,7 @@ public class FileIOController {
             job_skills.add("Python, ");
             job_skills.add("APIs, ");
             job_skills.add("SQL (and many of its variations), ");
-            job_skills.add("and many database management applications (MySQL, MS SQL Server, etc...).  ");
+            job_skills.add("and many database management applications (MySQL, MS SQL Server, etc...). ");
         }
         return job_skills;
     }
@@ -242,6 +250,8 @@ public class FileIOController {
     // param index: the index of the paragraph to search for custom fields
     private void find_replace_custom_fields(List<XWPFParagraph> paragraphs, XWPFParagraph paragraph, int index) { //, List<String> replacement_contents) {
         String search_para = paragraph.getText();
+        String role_name = get_job_role_name();
+        String company_name = get_company_name();
         for (Pattern pattern : custom_fields) {
             Matcher matcher = pattern.matcher(search_para);
             if (matcher.find()) {
@@ -256,14 +266,32 @@ public class FileIOController {
                     case "<COMPANY_NAME>":
                         XWPFParagraph company = paragraphs.get(index);
                         company.createRun();
-                        company.getRuns().get(0).setText(get_company_name(), 0);
+                        if (instance_count_company_name == 3) {
+                            company.getRuns().get(0).setText(company_name, 0);
+                            instance_count_company_name--;
+                        } else if (instance_count_company_name == 2) {
+                            company.getRuns().get(7).setText(company_name, 0);
+                            instance_count_company_name--;
+                        } else if (instance_count_company_name == 1) {
+                            company.getRuns().get(5).setText(company_name, 0);
+                            instance_count_company_name--;
+                        } else {
+                            System.out.println("ERROR: instance_count_company_name is not 1, 2, or 3");
+                        }
                         found_paragraph = paragraphs.get(index);
                         break;
                     case "<ROLE>":
                         XWPFParagraph role = paragraphs.get(index);
                         role.createRun();
-                        role.getRuns().get(0).setText(get_job_role_name(), 0);
-                        found_paragraph = paragraphs.get(index);
+                        if (instance_count_role_name == 2) {
+                            role.getRuns().get(1).setText(role_name, 0);
+                            instance_count_role_name--;
+                        } else if (instance_count_role_name == 1) {
+                            role.getRuns().get(1).setText(role_name, 0);
+                            instance_count_role_name--;
+                        } else {
+                            System.out.println("ERROR: instance_count_role_name is not 1 or 2");
+                        }                        found_paragraph = paragraphs.get(index);
                         break;
                     case "<LOCATION>":
                         XWPFParagraph location = paragraphs.get(index);
@@ -285,7 +313,7 @@ public class FileIOController {
                         }
                         XWPFParagraph tasks = paragraphs.get(index);
                         tasks.createRun();
-                        tasks.getRuns().get(0).setText(String.valueOf(replacement_tasks), 0);
+                        tasks.getRuns().get(5).setText(String.valueOf(replacement_tasks), 0);
                         found_paragraph = paragraphs.get(index);
                         break;
                     case "<SKILLS>":
@@ -296,18 +324,17 @@ public class FileIOController {
                         }
                         XWPFParagraph skills = paragraphs.get(index);
                         skills.createRun();
-                        skills.getRuns().get(0).setText(String.valueOf(replacement_skills), 0);
+                        skills.getRuns().get(8).setText(String.valueOf(replacement_skills), 0);
                         found_paragraph = paragraphs.get(index);
                         break;
                     case "<SITE_NAME>":
                         XWPFParagraph site_name = paragraphs.get(index);
                         site_name.createRun();
-                        site_name.getRuns().get(0).setText(this.site_name, 0);
+                        site_name.getRuns().get(3).setItalic(true);
+                        site_name.getRuns().get(3).setText(this.site_name, 0);
                         found_paragraph = paragraphs.get(index);
                         break;
                 }
-            } else {
-                index++;
             }
         }
     }
