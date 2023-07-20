@@ -11,6 +11,7 @@ Revision History:
 //Make unit tests for the FileIOController class
 package com.andrew_macdonald.custom_cl;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileIOController_tests {
+class FileIOControllerTests {
     //region Variables
     String site_name = "JobBank.ca";
     String company_name = "";
@@ -56,25 +57,28 @@ class FileIOController_tests {
     //region Tests
     //region Test getDate()
     @Test
-    void getDate() {
+    String getDate() {
         //Arrange
         String expected = "2023-07-15";
         //Act
         String actual = getDate();
         //Assert
         assertEquals(expected, actual);
+        return expected;
     }
     //endregion Test getDate()
 
     //region Test getJobPosting()
     @Test
-    void getJobPosting() {
+    String getJobPosting() {
         //Arrange
         String expected = "src\\main\\java\\com\\andrew_macdonald\\custom_cl\\job_posting.txt";
         //Act
         String actual = getJobPosting();
         //Assert
         assertEquals(expected, actual);
+        return expected;
     }
     //endregion Test getJobPosting()
+}
 

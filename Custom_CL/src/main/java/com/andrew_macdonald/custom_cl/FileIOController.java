@@ -16,12 +16,10 @@ import javafx.scene.control.Label;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -112,8 +110,13 @@ public class FileIOController {
         //TODO: Find a better way to get the company name without hardcoding the index
         XWPFParagraph paragraph = (XWPFParagraph) body.get(1); // The company name is always the second paragraph when it comes from JobBank.ca.
         String word_to_find = "details";
-        int start = paragraph.getText().indexOf(word_to_find) + (word_to_find.length() + 1); // The company name always starts after the word "details" when it comes from JobBank.ca.
-        return paragraph.getText().substring(start).trim();
+        int start = paragraph.getText().indexOf(word_to_find) + (word_to_find.length()); // The company name always starts after the word "details" when it comes from JobBank.ca.
+        String company_name = paragraph.getText().substring(start).trim();
+        company_name = (new ArrayList<>(Arrays.asList(company_name.toLowerCase().split(" "))))
+                .stream()
+                .map(word -> Character.toTitleCase(word.charAt(0)) + word.substring(1))
+                .collect(Collectors.joining(" "));
+        return company_name.trim();
     }
 
     // Get the job role name from the body of the job posting
@@ -218,14 +221,18 @@ public class FileIOController {
     // return: a list of the skills
     private List<String> get_skills() {
         List<IBodyElement> body = job_posting.getBodyElements();
-        int start_index = find_start_end_indexes(body, "Skills").get(0);
+        int start_index = find_start_end_indexes(body, "Skills").get(0); // Change Skills to Computer and technology knowledge
         int end_index = find_start_end_indexes(body, "Skills").get(1);
         XWPFParagraph body_para;
         List<String> job_skills = new ArrayList<>();
         for (int i = start_index; i < end_index - 1; i++) {
             if (body.get(i) instanceof XWPFParagraph) {
                 body_para = (XWPFParagraph) body.get(i);
-                if (body_para.getText().length() > 0) {
+                body_para.createRun();
+                int font_size = body_para.getRuns().get(0).getFontSize();
+                if (font_size == 13) {
+                    break;
+                } else if (body_para.getText().length() > 0) {
                     if (i == start_index)
                         job_skills.add(" " + body_para.getText().toLowerCase() + ", ");
                     else
@@ -241,7 +248,9 @@ public class FileIOController {
             job_skills.add("Python, ");
             job_skills.add("APIs, ");
             job_skills.add("SQL (and many of its variations), ");
-            job_skills.add("and many database management applications (MySQL, MS SQL Server, etc...). ");
+            job_skills.add("and many database management applications (MySQL, MS SQL Server, etc...).");
+        } else {
+            job_skills.add("and many database management applications (MySQL, MS SQL Server, etc...).");
         }
         return job_skills;
     }
@@ -253,7 +262,7 @@ public class FileIOController {
     private void find_replace_custom_fields(List<XWPFParagraph> paragraphs, XWPFParagraph paragraph, int index) { //, List<String> replacement_contents) {
         String search_para = paragraph.getText();
         String role_name = get_job_role_name();
-        String company_name = get_company_name();
+        String company_name = get_company_name().trim().replaceAll('\u00A0' + "", " ").trim();
         for (Pattern pattern : custom_fields) {
             Matcher matcher = pattern.matcher(search_para);
             if (matcher.find()) {
@@ -372,6 +381,8 @@ public class FileIOController {
     protected void onSelectJobPostingButtonClick() {
         try {
             job_posting = get_job_posting();
+            instance_count_role_name = 2;
+            instance_count_company_name = 3;
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error getting job posting");
