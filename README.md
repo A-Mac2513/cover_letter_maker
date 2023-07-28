@@ -9,9 +9,9 @@ I used the app to remove the word "VERIFIED" from the string that came back when
 
 ## Version 2 ##
 In this version the app will have the same functionality as v1, however, added will be a drop down to select where the job posting came from (the most popular 3 or 4 to start).
-From this dropdown selection, the app with knoow the template of the specific job posting format and find the needed information this way.
+From this dropdown selection, the app with know the template of the specific job posting format and find the needed information this way.
 May also have a form that the information can be manually enetered in or edited after parsing the file.
 
 ## Version 3 ##
 In this version of the app my hope is the app will scrape the information from the job posting directly from the web.  Display the information on a form, user confirms or edits then confirms.
-The app will also generate the email and send it.  Or mayble even apply for the user via the given method from the job posting.
+The app will also generate the email and send it.  Or mayble even apply for the user via the given method from the job posting. May try to customize the RESUME in this version as well.
