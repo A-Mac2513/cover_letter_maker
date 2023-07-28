@@ -14,9 +14,12 @@ package com.andrew_macdonald.custom_cl;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MainApplication extends Application {
     @Override
@@ -25,8 +28,12 @@ public class MainApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
         // Customize the stage
         stage.setTitle("Custom Cover Letter Creator");
-        // stage.setFullScreen(true); // make the stage full screen
         stage.setScene(scene);
+        // stage.setFullScreen(true); // make the stage full screen
+        // Change the icon
+        InputStream iconStream = new FileInputStream("D:/cover_letter_maker/VERSION_01/Custom_CL/images/donatello3.png");
+        Image image = new Image(iconStream);
+        stage.getIcons().add(image);
         stage.show();
     }
 
