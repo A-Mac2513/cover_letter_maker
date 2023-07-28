@@ -12,6 +12,7 @@ When I created a jar file, and ran that jar file, some of the File paths no long
 In this version the app will have the same functionality as v1, however, added will be a drop down to select where the job posting came from (the most popular 3 or 4 to start).
 From this dropdown selection, the app with know the template of the specific job posting format and find the needed information this way.
 May also have a form that the information can be manually enetered in or edited after parsing the file.
+Want to add a button, that will run a PowerShell script so all the .docx files created get copied as .pdf files, with accepting an argument as to the starting directoy
 
 ## Version 3 ##
 In this version of the app my hope is the app will scrape the information from the job posting directly from the web.  Display the information on a form, user confirms or edits then confirms.
