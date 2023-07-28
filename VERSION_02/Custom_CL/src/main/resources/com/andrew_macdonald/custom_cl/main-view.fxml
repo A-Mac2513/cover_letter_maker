@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Project: Custom Cover Letter Creator
+    Created By: Andrew Macdonald
+    Created On: 2023-07-15
+
+    File Name : main-view.fxml
+    Revision History:
+    Andrew Macdonald, 2023-07-15 : Created
+-->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0" prefWidth="691.0" spacing="20.0" style="-fx-alignment: center; -fx-background-color: gray;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andrew_macdonald.custom_cl.FileIOController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label fx:id="outputText" alignment="TOP_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="250.0" style="-fx-background-color: beige;" VBox.vgrow="ALWAYS">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font></Label>
+    <Button alignment="CENTER" onAction="#onSelectJobPostingButtonClick" prefHeight="52.0" prefWidth="150.0" style="-fx-background-color: #164B60; -fx-border-radius: 50px;" text="Select Job Posting" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="ALWAYS">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Button>
+    <Button alignment="CENTER" onAction="#onMakeCustomCLButtonClick" prefHeight="52.0" prefWidth="150.0" style="-fx-background-color: #0079FF; -fx-border-radius: 50px;" text="Create Cover Letter" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="ALWAYS">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Button>
+</VBox>

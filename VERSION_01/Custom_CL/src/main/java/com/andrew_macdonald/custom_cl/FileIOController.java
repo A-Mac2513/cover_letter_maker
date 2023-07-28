@@ -399,7 +399,7 @@ public class FileIOController {
         get_folder_path();
 
         // get the template for the cover letter
-        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("templates/CL_template.docx"));
+        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("templates/CL_Template.docx"));
 
         // Get all paragraphs from template
         List<XWPFParagraph> paragraphs = template_cover_letter.getParagraphs();
