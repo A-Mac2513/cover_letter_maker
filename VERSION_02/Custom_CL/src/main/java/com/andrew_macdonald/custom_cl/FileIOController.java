@@ -94,12 +94,10 @@ public class FileIOController {
                 outputText.setText("No job posting selected");
             }
         } catch (Exception e) {
-            System.out.println("No file selected");
             throw new RuntimeException(e);
         }
         assert job_posting != null;
         FileInputStream fis = new FileInputStream(job_posting);
-        System.out.println("File Path: " + folder_path);
         return new XWPFDocument(fis);
     }
 
@@ -206,7 +204,6 @@ public class FileIOController {
             }
         }
         if (job_tasks.size() < 1) {
-            System.out.println("No tasks found, using default tasks");
             job_tasks.add(" gather client requirements, ");
             job_tasks.add("develop and produce documentation as part of the System Development Life Cycle, ");
             job_tasks.add("prepare mock-ups and storyboards, ");
@@ -241,7 +238,6 @@ public class FileIOController {
             }
         }
         if (job_skills.size() < 1) {
-            System.out.println("No skills found, using default skills");
             job_skills.add("C#, ");
             job_skills.add(".NET, ");
             job_skills.add("Java, ");
@@ -266,7 +262,6 @@ public class FileIOController {
         for (Pattern pattern : custom_fields) {
             Matcher matcher = pattern.matcher(search_para);
             if (matcher.find()) {
-                System.out.println("Found " + pattern);
                 switch (matcher.group()) {
                     case "<DATE>":
                         XWPFParagraph date = paragraphs.get(index);
@@ -286,8 +281,6 @@ public class FileIOController {
                         } else if (instance_count_company_name == 1) {
                             company.getRuns().get(5).setText(company_name, 0);
                             instance_count_company_name--;
-                        } else {
-                            System.out.println("ERROR: instance_count_company_name is not 1, 2, or 3");
                         }
                         found_paragraph = paragraphs.get(index);
                         break;
@@ -300,9 +293,8 @@ public class FileIOController {
                         } else if (instance_count_role_name == 1) {
                             role.getRuns().get(1).setText(role_name, 0);
                             instance_count_role_name--;
-                        } else {
-                            System.out.println("ERROR: instance_count_role_name is not 1 or 2");
-                        }                        found_paragraph = paragraphs.get(index);
+                        }
+                        found_paragraph = paragraphs.get(index);
                         break;
                     case "<LOCATION>":
                         XWPFParagraph location = paragraphs.get(index);
@@ -357,15 +349,12 @@ public class FileIOController {
         File file = new File(folder_path);
         // Check if the directory exists, if not, create it
         if (!file.exists()) {
-            System.out.println("Creating directory: " + folder_path);
             boolean file_made = file.mkdirs();
-            System.out.println("File made: " + file_made);
         }
         // Create the output stream and write the file
         FileOutputStream out_stream = new FileOutputStream(new File(folder_path + "\\" + file_name));
         template_cover_letter.write(out_stream);
 
-        System.out.println("Written to file: " + folder_path + file_name);
         // Close the output stream
         out_stream.close();
     }
@@ -385,8 +374,6 @@ public class FileIOController {
             instance_count_company_name = 3;
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error getting job posting");
-            System.err.println(e.getMessage());
         }
     }
 
@@ -394,15 +381,22 @@ public class FileIOController {
     // Makes a custom cover letter for the job posting
     // param event: the event that triggered the event handler
     @FXML
-    public void onMakeCustomCLButtonClick(ActionEvent actionEvent) throws IOException {
+    protected void onMakeCustomCLButtonClick() throws IOException {
+        outputText.setText("Creating ...");
+
         // Get the folder path
         get_folder_path();
+        outputText.setText("Got folder path ...");
+
 
         // get the template for the cover letter
-        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("templates/CL_Template.docx"));
+//        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("./templates/CL_Template.docx")); // This works from the IDE
+        XWPFDocument template_cover_letter = new XWPFDocument(new FileInputStream("D:\\cover_letter_maker\\VERSION_01\\Custom_CL\\templates\\CL_Template.docx")); // This works from the JAR
+        outputText.setText("Got Template ...");
 
         // Get all paragraphs from template
         List<XWPFParagraph> paragraphs = template_cover_letter.getParagraphs();
+        outputText.setText("Got paragraphs ...");
 
         // Find that paragraph that contains the custom field
         int index = 0;
@@ -415,9 +409,12 @@ public class FileIOController {
         }
         // Write the cover letter to a file
         write_custom_cover_letter(template_cover_letter);
+        outputText.setText("Writing ...");
 
         // Close the template
         template_cover_letter.close();
+        outputText.setText("Cover Letter Created!");
+
     }
 
     //endregion Event Handlers
