@@ -1,19 +1,34 @@
-# cover_letter_maker
-My personal app to use a job posting to customize a cover letter template to the posting.
+# Cover Letter Maker
+A tool to customize cover letter templates based on job postings.
 
-## Version 1 ##
-In this version the app will have limited functionality.  It will have single button as the UI, in which once it has been clicked the user chooses the file, and the Custom Cover Letter will be generated in the same directory the file was chosen from.
-### Things I learned ###
-I used the app to remove the word "VERIFIED" from the string that came back when I grabbed the Role_Name.  Problem was it replaced it with a non-breaking space instead of a whitespace.  So I had no idea why i was getting a role name with extra spaces at the end in my cover letter file.  After 2hrs of playing with regex and string manipulation, I got the bright idea (should have maybe started here) to print out the ascii code, look that up to find out what it was, then use the unicode for a non-breaking space to put into the replaceAll().
-When I created a jar file, and ran that jar file, some of the File paths no longer worked as they did in the IDE.
+## Features
+- **Dynamic Placeholder Replacement:** Customize a cover letter template by replacing placeholders like `<ROLE>` and `<COMPANY_NAME>` with details from a job posting.
+- **Simple UI:** A single button to process the job posting and generate a cover letter.
+- **Output Location:** The customized cover letter is saved in the same directory as the input file.
 
+## Getting Started
+### Prerequisites
+- **Java 11+**
+- **Apache POI Library** (for `.docx` manipulation)
+- **JavaFX** (for the UI)
 
-## Version 2 ##
-In this version the app will have the same functionality as v1, however, added will be a drop down to select where the job posting came from (the most popular 3 or 4 to start).
-From this dropdown selection, the app with know the template of the specific job posting format and find the needed information this way.
-May also have a form that the information can be manually enetered in or edited after parsing the file.
-Want to add a button, that will run a PowerShell script so all the .docx files created get copied as .pdf files, with accepting an argument as to the starting directoy
+### Usage
+1. Run the app (via IDE or JAR file).
+2. Click **"Select Job Posting"** to choose a `.txt` or `.docx` file containing the job posting.
+3. Click **"Make Custom CL"** to generate the cover letter.
+4. The cover letter (`Cover Letter.docx`) will be saved in the same directory as the input file.
 
-## Version 3 ##
-In this version of the app my hope is the app will scrape the information from the job posting directly from the web.  Display the information on a form, user confirms or edits then confirms.
-The app will also generate the email and send it.  Or mayble even apply for the user via the given method from the job posting. May try to customize the RESUME in this version as well.
+## Lessons Learned
+- Resolved issues with non-breaking spaces (`\u00A0`) affecting string replacements.
+- Addressed file path differences when running the app as a JAR file.
+
+## Roadmap
+### Version 2 (Planned)
+- Dropdown to handle multiple job posting formats.
+- Manual data entry/editing post-parsing.
+- PowerShell integration for `.pdf` conversion.
+
+### Version 3 (Planned)
+- Web scraping for job postings.
+- Automatic application submission.
+- Resume customization.

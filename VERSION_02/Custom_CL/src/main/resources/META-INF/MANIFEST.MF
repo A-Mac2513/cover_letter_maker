@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: com.andrew_macdonald.custom_cl.EntryPoint
-
