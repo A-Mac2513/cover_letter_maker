@@ -70,3 +70,7 @@ Thumbs.db
 
 # Vercel
 .vercel
+
+# Node Modules
+/node_modules/
+node_modules/
